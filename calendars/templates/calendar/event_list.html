@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - MyCalendar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-list"></i>
+    All Events
+</div>
+
+<div class="mb-4">
+    <a href="{% url 'calendar:create_event' %}" class="btn btn-primary-modern btn-modern">
+        <i class="fas fa-plus"></i> Create New Event
+    </a>
+</div>
+
+{% if events %}
+<div class="row">
+    {% for event in events %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card card-modern h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <span class="badge badge-{{ event.get_category_color }}">{{ event.category }}</span>
+                </div>
+                
+                <p class="card-text text-muted mb-2">{{ event.description|truncatewords:15 }}</p>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block">
+                        <i class="fas fa-calendar-alt"></i> {{ event.start_date|date:"M d, Y" }}
+                    </small>
+                    <small class="text-muted d-block">
+                        <i class="fas fa-clock"></i> {{ event.start_date|time:"g:i A" }} - {{ event.end_date|time:"g:i A" }}
+                    </small>
+                    {% if event.location %}
+                    <small class="text-muted d-block">
+                        <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                    </small>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <span class="badge badge-{{ event.get_status_color }}">{{ event.status }}</span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'calendar:event_detail' event.pk %}" class="btn btn-sm btn-info text-white flex-grow-1">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    <a href="{% url 'calendar:edit_event' event.pk %}" class="btn btn-sm btn-warning flex-grow-1">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form method="post" action="{% url 'calendar:delete_event' event.pk %}" class="d-inline" style="flex: 1;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger w-100" onclick="return confirm('Delete this event?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-inbox fa-5x text-muted mb-3" style="opacity: 0.5;"></i>
+    <h4 class="text-muted">No Events Yet</h4>
+    <p class="text-muted mb-3">Start by creating your first event</p>
+    <a href="{% url 'calendar:create_event' %}" class="btn btn-primary-modern btn-modern btn-lg">
+        <i class="fas fa-plus"></i> Create First Event
+    </a>
+</div>
+{% endif %}
+{% endblock %}

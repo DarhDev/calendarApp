@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Calendar App{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #56ab2f;
+            --danger: #ff6b6b;
+            --warning: #ffd93d;
+            --info: #4ecdc4;
+            --light: #f8f9fa;
+            --dark: #2d3436;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 70px;
+            color: var(--dark);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            color: var(--dark) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar .btn {
+            margin-left: 10px;
+        }
+
+        /* Main Container */
+        .main-container {
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .card-modern {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            background: white;
+            overflow: hidden;
+        }
+
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Buttons */
+        .btn-modern {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-success-modern {
+            background: linear-gradient(135deg, var(--success) 0%, #3a7d1e 100%);
+            color: white;
+        }
+
+        .btn-success-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(86, 171, 47, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-danger-modern {
+            background: linear-gradient(135deg, var(--danger) 0%, #e63946 100%);
+            color: white;
+        }
+
+        .btn-danger-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Headers */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+        .page-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Forms */
+        .form-control-modern {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-modern:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-label-modern {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Event/Appointment Cards */
+        .event-card {
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .event-card.work {
+            border-left-color: #667eea;
+        }
+
+        .event-card.personal {
+            border-left-color: #764ba2;
+        }
+
+        .event-card.birthday {
+            border-left-color: #ff6b6b;
+        }
+
+        .event-card.meeting {
+            border-left-color: #4ecdc4;
+        }
+
+        .event-card.holiday {
+            border-left-color: #ffd93d;
+        }
+
+        .event-card h4 {
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .event-card p {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .badge-category {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-top: 8px;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .calendar-day {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .calendar-day.today {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: transparent;
+            font-weight: 700;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #fafafa;
+        }
+
+        .calendar-day-date {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .calendar-day-events {
+            font-size: 0.75rem;
+        }
+
+        .calendar-day-event-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin: 2px;
+            background: var(--primary);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: var(--dark);
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+
+            .calendar-day {
+                padding: 8px;
+                min-height: 80px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-planned {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-in-progress {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-completed {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-cancelled {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        /* Alert Messages */
+        .alert-success {
+            background: linear-gradient(135deg, rgba(86, 171, 47, 0.1) 0%, rgba(58, 125, 30, 0.1) 100%);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(230, 57, 70, 0.1) 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Notification Dropdown Styles */
+        .notification-bell {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            transform: scale(1.1);
+            color: var(--primary) !important;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--danger) 0%, #e63946 100%);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            animation: badge-pulse 2s infinite;
+        }
+
+        @keyframes badge-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-dropdown {
+            min-width: 350px;
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            animation: dropdownSlide 0.3s ease-out;
+        }
+
+        @keyframes dropdownSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-list-container {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notification-item {
+            display: block;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 20px;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification-item.unread:hover {
+            background-color: #e8f1ff;
+        }
+
+        .notification-item-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-item-title i {
+            font-size: 0.8rem;
+        }
+
+        .notification-item-message {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .notification-item-time {
+            color: #999;
+            font-size: 0.75rem;
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .dropdown-header .btn-link {
+            color: var(--primary) !important;
+            font-size: 0.8rem;
+            padding: 0;
+            text-decoration: none;
+        }
+
+        .dropdown-header .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .dropdown-footer {
+            padding: 12px 16px;
+        }
+
+        /* Empty state */
+        .notification-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+        }
+
+        .notification-empty i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Scrollbar styling */
+        .notification-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'events:dashboard' %}">
+                <i class="fas fa-calendar-alt"></i> Calendar Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'events:dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="eventsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calendar"></i> Events
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="eventsDropdown">
+                            <li><a class="dropdown-item" href="{% url 'events:calendar' %}">Calendar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'events:event_list' %}">All Events</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'events:create_event' %}">
+                                <i class="fas fa-plus"></i> New Event
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="appointmentsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-clock"></i> Appointments
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="appointmentsDropdown">
+                            <li><a class="dropdown-item" href="{% url 'events:appointment_list' %}">All Appointments</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'events:create_appointment' %}">
+                                <i class="fas fa-plus"></i> New Appointment
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown notification-dropdown-container">
+                        <a class="nav-link notification-bell" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notif-badge" style="display: none;">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationsDropdown" id="notification-dropdown-menu">
+                            <li class="dropdown-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>Notifications</strong>
+                                    <a href="{% url 'notifications:notification_list' %}" class="btn btn-sm btn-link">View All</a>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li id="notification-list-container" class="notification-list-container">
+                                <div class="text-center text-muted py-3">
+                                    <small>Loading notifications...</small>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <div class="dropdown-footer">
+                                    <a href="{% url 'notifications:notification_list' %}" class="btn btn-sm btn-primary-modern w-100">
+                                        <i class="fas fa-eye"></i> View All Notifications
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Calendar Pro. All rights reserved. | Built with <i class="fas fa-heart" style="color: var(--danger);"></i> Django</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Notification System
+        class NotificationDropdown {
+            constructor() {
+                this.dropdownElement = document.getElementById('notificationsDropdown');
+                this.badgeElement = document.getElementById('notif-badge');
+                this.listContainer = document.getElementById('notification-list-container');
+                this.dropdownMenu = document.getElementById('notification-dropdown-menu');
+                
+                this.init();
+            }
+            
+            init() {
+                // Load notifications when dropdown is shown
+                this.dropdownMenu.addEventListener('show.bs.dropdown', () => {
+                    console.log('Dropdown opened, fetching notifications...');
+                    this.fetchNotifications();
+                });
+                
+                // Update badge on page load
+                this.updateBadge();
+                
+                // Fetch notifications every 30 seconds
+                setInterval(() => this.updateBadge(), 30000);
+            }
+            
+            updateBadge() {
+                fetch('/notifications/api/unread-count/')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Badge data:', data);
+                        const count = data.unread_count;
+                        if (count > 0) {
+                            this.badgeElement.textContent = count > 99 ? '99+' : count;
+                            this.badgeElement.style.display = 'flex';
+                        } else {
+                            this.badgeElement.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching notification count:', error));
+            }
+            
+            fetchNotifications() {
+                console.log('Fetching notifications from API...');
+                fetch('/notifications/api/recent/?limit=5')
+                    .then(response => {
+                        console.log('API response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Raw API response:', data);
+                        if (data.notifications) {
+                            console.log('Notifications count:', data.notifications.length);
+                            this.renderNotifications(data.notifications);
+                        } else {
+                            console.error('No notifications key in response');
+                            this.showError('Invalid response format');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notifications:', error);
+                        this.showError('Failed to load notifications: ' + error.message);
+                    });
+            }
+            
+            showError(message) {
+                this.listContainer.innerHTML = `
+                    <div class="notification-empty">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p><small>${message}</small></p>
+                    </div>
+                `;
+            }
+            
+            renderNotifications(notifications) {
+                console.log('Rendering notifications:', notifications);
+                
+                if (!notifications || notifications.length === 0) {
+                    this.listContainer.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-bell-slash"></i>
+                            <p><small>No notifications yet</small></p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                notifications.forEach((notif, index) => {
+                    try {
+                        console.log(`Processing notification ${index}:`, notif);
+                        
+                        const dateObj = new Date(notif.scheduled_time);
+                        if (isNaN(dateObj.getTime())) {
+                            console.error(`Invalid date for notification ${index}:`, notif.scheduled_time);
+                            return;
+                        }
+                        
+                        const timeStr = this.formatTime(dateObj);
+                        const isUnread = notif.status === 'pending' || notif.status === 'sent';
+                        const typeIcon = this.getTypeIcon(notif.type);
+                        
+                        html += `
+                            <li>
+                                <a href="/notifications/${notif.id}/" class="notification-item ${isUnread ? 'unread' : ''}">
+                                    <div class="notification-item-title">
+                                        <span>${typeIcon} ${notif.title}</span>
+                                        ${isUnread ? '<i class="fas fa-circle" style="color: var(--info); font-size: 0.5rem;"></i>' : ''}
+                                    </div>
+                                    <div class="notification-item-message">${notif.message}</div>
+                                    <div class="notification-item-time">${timeStr}</div>
+                                </a>
+                            </li>
+                        `;
+                    } catch (e) {
+                        console.error(`Error processing notification ${index}:`, e);
+                    }
+                });
+                
+                if (html) {
+                    this.listContainer.innerHTML = html;
+                } else {
+                    this.showError('Could not render notifications');
+                }
+            }
+            
+            getTypeIcon(type) {
+                const icons = {
+                    'event': '<i class="fas fa-calendar-check" style="color: #3498db;"></i>',
+                    'appointment': '<i class="fas fa-user-clock" style="color: #17a2b8;"></i>',
+                    'reminder': '<i class="fas fa-bell" style="color: #ffc107;"></i>',
+                    'general': '<i class="fas fa-info-circle" style="color: #6c757d;"></i>'
+                };
+                return icons[type] || icons['general'];
+            }
+            
+            formatTime(date) {
+                try {
+                    const now = new Date();
+                    const diffMs = now - date;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMs / 3600000);
+                    const diffDays = Math.floor(diffMs / 86400000);
+                    
+                    if (diffMins < 1) return 'just now';
+                    if (diffMins < 60) return `${diffMins} min ago`;
+                    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                    
+                    return date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (e) {
+                    console.error('Error formatting time:', e);
+                    return 'unknown time';
+                }
+            }
+        }
+        
+        // Initialize notification dropdown when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing NotificationDropdown...');
+            try {
+                new NotificationDropdown();
+                console.log('NotificationDropdown initialized successfully');
+            } catch (e) {
+                console.error('Error initializing NotificationDropdown:', e);
+            }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

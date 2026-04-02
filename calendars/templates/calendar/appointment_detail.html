@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ appointment.attendee_name }} - MyCalendar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-handshake"></i>
+    {{ appointment.attendee_name }}
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-info-circle"></i> Appointment Details</span>
+                <div>
+                    <a href="{% url 'calendar:edit_appointment' appointment.pk %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form method="post" action="{% url 'calendar:delete_appointment' appointment.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this appointment?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-4">
+                    <i class="fas fa-user"></i> Attendee Information
+                </h5>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Name</h6>
+                        <p class="fw-600">{{ appointment.attendee_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Appointment Type</h6>
+                        <span class="badge badge-info">{{ appointment.appointment_type }}</span>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Email</h6>
+                        <p>
+                            <a href="mailto:{{ appointment.attendee_email }}">
+                                <i class="fas fa-envelope"></i> {{ appointment.attendee_email }}
+                            </a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Phone</h6>
+                        <p>
+                            <a href="tel:{{ appointment.attendee_phone }}">
+                                <i class="fas fa-phone"></i> {{ appointment.attendee_phone }}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <h5 class="mb-4">
+                    <i class="fas fa-calendar-check"></i> Appointment Schedule
+                </h5>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Date</h6>
+                        <p>{{ appointment.start_time|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Status</h6>
+                        <span class="badge badge-{{ appointment.get_status_color }}">{{ appointment.status }}</span>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">Start Time</h6>
+                        <p>{{ appointment.start_time|time:"g:i A" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2">End Time</h6>
+                        <p>{{ appointment.end_time|time:"g:i A" }}</p>
+                    </div>
+                </div>
+
+                {% if appointment.location %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Location</h6>
+                    <p><i class="fas fa-map-marker-alt text-danger"></i> {{ appointment.location }}</p>
+                </div>
+                {% endif %}
+
+                {% if appointment.notes %}
+                <div class="mb-4">
+                    <h6 class="text-muted mb-2">Notes</h6>
+                    <p>{{ appointment.notes|linebreaks }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header">
+                <i class="fas fa-phone"></i> Quick Contact
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="mailto:{{ appointment.attendee_email }}" class="btn btn-primary-modern btn-modern">
+                        <i class="fas fa-envelope"></i> Send Email
+                    </a>
+                    <a href="tel:{{ appointment.attendee_phone }}" class="btn btn-primary-modern btn-modern">
+                        <i class="fas fa-phone"></i> Call
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-modern mt-3">
+            <div class="card-header card-modern-header">
+                <i class="fas fa-calendar"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'calendar:edit_appointment' appointment.pk %}" class="btn btn-primary-modern btn-modern">
+                        <i class="fas fa-edit"></i> Edit Appointment
+                    </a>
+                    <a href="{% url 'calendar:appointment_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card card-modern mt-3">
+            <div class="card-header card-modern-header">
+                <i class="fas fa-info-circle"></i> Appointment Info
+            </div>
+            <div class="card-body">
+                <small class="text-muted d-block mb-2">
+                    <strong>Created:</strong> {{ appointment.created_at|date:"M d, Y g:i A" }}
+                </small>
+                <small class="text-muted d-block">
+                    <strong>Updated:</strong> {{ appointment.updated_at|date:"M d, Y g:i A" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

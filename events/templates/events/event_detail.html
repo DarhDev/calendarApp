@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 style="color: {{ event.color }};">
+                <i class="fas fa-calendar-check"></i> {{ event.title }}
+            </h1>
+            <p>Event Details & Information</p>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <!-- Event Details -->
+            <div class="col-md-8 mb-4">
+                <div class="card-modern p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-info-circle"></i> Event Details</h3>
+                        <span class="status-badge status-{{ event.status|lower }}">{{ event.get_status_display }}</span>
+                    </div>
+                    <hr>
+
+                    <!-- Basic Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-calendar"></i> Start Date & Time</p>
+                            <p style="font-size: 1.1rem; font-weight: 600;">{{ event.start_date|date:'M d, Y - H:i' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-calendar"></i> End Date & Time</p>
+                            <p style="font-size: 1.1rem; font-weight: 600;">{{ event.end_date|date:'M d, Y - H:i' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Category & Location -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-tag"></i> Category</p>
+                            <p style="font-size: 1.1rem; font-weight: 600;">{{ event.get_category_display }}</p>
+                        </div>
+                        {% if event.location %}
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> Location</p>
+                            <p style="font-size: 1.1rem; font-weight: 600;">{{ event.location }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    {% if event.description %}
+                    <div class="mb-4">
+                        <p style="color: #999; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-align-left"></i> Description</p>
+                        <p style="font-size: 1rem; line-height: 1.6; color: #555;">{{ event.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- All Day Badge -->
+                    {% if event.all_day %}
+                    <div style="background: rgba(102, 126, 234, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0; color: var(--primary); font-weight: 600;">
+                            <i class="fas fa-infinity"></i> This is an all-day event
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 30px;">
+                        <a href="{% url 'events:edit_event' event.pk %}" class="btn btn-primary-modern" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'events:event_list' %}" class="btn btn-primary-modern" style="background: #999; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        <form method="POST" action="{% url 'events:delete_event' event.pk %}" onsubmit="return confirm('Are you sure?');" style="display: 100%;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger-modern w-100">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reminders Sidebar -->
+            <div class="col-md-4">
+                <div class="card-modern p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4><i class="fas fa-bell" style="color: var(--danger);"></i> Reminders</h4>
+                        <a href="{% url 'events:create_reminder' event.pk %}" class="btn btn-success-modern btn-sm" style="padding: 6px 12px; font-size: 0.8rem;">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    </div>
+                    <hr>
+
+                    {% if reminders %}
+                        {% for reminder in reminders %}
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid var(--danger);">
+                            <p style="font-weight: 600; margin: 0 0 5px 0; color: var(--dark);">
+                                {{ reminder.get_reminder_type_display }}
+                            </p>
+                            <p style="color: #999; font-size: 0.85rem; margin: 5px 0;">
+                                <i class="fas fa-clock"></i> {{ reminder.time_before }} {{ reminder.get_time_unit_display }}
+                            </p>
+                            <p style="color: #999; font-size: 0.85rem; margin: 5px 0;">
+                                <i class="fas fa-calendar"></i> {{ reminder.reminder_time|date:'M d, Y - H:i' }}
+                            </p>
+                            {% if reminder.is_sent %}
+                            <span style="display: inline-block; background: #e8f5e9; color: var(--success); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
+                                <i class="fas fa-check"></i> Sent
+                            </span>
+                            {% else %}
+                            <span style="display: inline-block; background: #fff3e0; color: #f57c00; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
+                                <i class="fas fa-hourglass"></i> Pending
+                            </span>
+                            {% endif %}
+                            <form method="POST" action="{% url 'events:delete_reminder' reminder.pk %}" style="display: inline; margin-left: 10px;" onsubmit="return confirm('Delete this reminder?');">
+                                {% csrf_token %}
+                                <button type="submit" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; text-decoration: underline;">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p style="color: #999; text-align: center; padding: 20px 0;">
+                        <i class="fas fa-inbox"></i> No reminders set
+                    </p>
+                    <a href="{% url 'events:create_reminder' event.pk %}" class="btn btn-success-modern w-100">
+                        <i class="fas fa-bell"></i> Add Reminder
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Event Info Card -->
+                <div class="card-modern p-4">
+                    <h4><i class="fas fa-lightbulb"></i> Event Info</h4>
+                    <hr>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                        <p style="margin: 0 0 10px 0;">
+                            <strong>Created:</strong> {{ event.created_at|date:'M d, Y' }}
+                        </p>
+                        <p style="margin: 0;">
+                            <strong>Duration:</strong> 
+                            {% widthratio event.end_date event.start_date 100 %} 
+                            {{ event.end_date|timeuntil:event.start_date }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

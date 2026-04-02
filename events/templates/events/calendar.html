@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Calendar - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-calendar-check"></i> Calendar {{ year }}</h1>
+                    <p>View and manage your events for {{ month_name }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'events:create_event' %}" class="btn btn-primary-modern">
+                        <i class="fas fa-plus"></i> Add Event
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Navigation -->
+    <div class="container mb-4">
+        <div class="row align-items-center mt-4">
+            <div class="col-md-4">
+                {% if month > 1 %}
+                <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn btn-primary-modern">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+                {% else %}
+                <a href="?year={{ year|add:'-1' }}&month=12" class="btn btn-primary-modern">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-center">
+                <h2 class="mb-0">{{ month_name }} {{ year }}</h2>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if month < 12 %}
+                <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn btn-primary-modern">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <a href="?year={{ year|add:'1' }}&month=1" class="btn btn-primary-modern">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="container">
+        <div class="card-modern p-4">
+            <!-- Days of week header -->
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px;">
+                {% for day_name in daynames %}
+                <div style="text-align: center; font-weight: 700; color: var(--primary); padding: 10px;">
+                    {{ day_name }}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Calendar Days -->
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;">
+                {% for week in calendar %}
+                    {% for day in week %}
+                        {% if day == 0 %}
+                        <div class="calendar-day calendar-day-empty"></div>
+                        {% else %}
+                            {% if day == today.day and month == today.month and year == today.year %}
+                            <div class="calendar-day today">
+                                <span class="calendar-day-date">{{ day }}</span>
+                                <div class="calendar-day-events">
+                                    <!-- Events for today -->
+                                    {% for event in events_by_day|get_item:day %}
+                                        <div class="event-item" style="background-color: {{ event.color }}; color: white; padding: 3px 5px; margin: 2px 0; border-radius: 3px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <a href="{% url 'events:event_detail' event.pk %}" style="color: white; text-decoration: none;" title="{{ event.title }}">📌 {{ event.title }}</a>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    <!-- Appointments for today -->
+                                    {% for appointment in appointments_by_day|get_item:day %}
+                                        <div class="appointment-item" style="background-color: #17a2b8; color: white; padding: 3px 5px; margin: 2px 0; border-radius: 3px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <a href="{% url 'events:appointment_detail' appointment.pk %}" style="color: white; text-decoration: none;" title="{{ appointment.attendee_name }}">🗓️ {{ appointment.attendee_name }}</a>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    <!-- Available date indicator -->
+                                    {% if day in available_dates %}
+                                        <div style="color: #28a745; font-size: 10px; margin-top: 3px; font-weight: bold;">✓ Available</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="calendar-day {% if day in available_dates %}available-day{% endif %}">
+                                <span class="calendar-day-date">{{ day }}</span>
+                                <div class="calendar-day-events">
+                                    <!-- Events -->
+                                    {% for event in events_by_day|get_item:day %}
+                                        <div class="event-item" style="background-color: {{ event.color }}; color: white; padding: 3px 5px; margin: 2px 0; border-radius: 3px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <a href="{% url 'events:event_detail' event.pk %}" style="color: white; text-decoration: none;" title="{{ event.title }}">📌 {{ event.title }}</a>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    <!-- Appointments -->
+                                    {% for appointment in appointments_by_day|get_item:day %}
+                                        <div class="appointment-item" style="background-color: #17a2b8; color: white; padding: 3px 5px; margin: 2px 0; border-radius: 3px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <a href="{% url 'events:appointment_detail' appointment.pk %}" style="color: white; text-decoration: none;" title="{{ appointment.attendee_name }}">🗓️ {{ appointment.attendee_name }}</a>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                    <!-- Available date indicator -->
+                                    {% if day in available_dates %}
+                                        <div style="color: #28a745; font-size: 10px; margin-top: 3px; font-weight: bold;">✓ Available</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events and Reminders -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-modern p-4">
+                    <h3><i class="fas fa-bell" style="color: var(--danger);"></i> Upcoming Reminders</h3>
+                    <hr>
+                    {% if reminders %}
+                        {% for reminder in reminders %}
+                        <div class="event-card" style="border-left-color: var(--danger);">
+                            <h5>{{ reminder.event.title }}</h5>
+                            <p>
+                                <i class="fas fa-clock"></i> {{ reminder.reminder_time|date:'M d, Y - H:i' }}
+                            </p>
+                            <span class="badge-category" style="background: rgba(255, 107, 107, 0.2); color: var(--danger);">
+                                {{ reminder.get_reminder_type_display }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted"><i class="fas fa-inbox"></i> No upcoming reminders</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-modern p-4">
+                    <h3><i class="fas fa-list" style="color: var(--primary);"></i> Events This Month</h3>
+                    <hr>
+                    {% if events %}
+                        {% for event in events|slice:':5' %}
+                        <div class="event-card" style="border-left-color: var(--primary);">
+                            <h5>{{ event.title }}</h5>
+                            <p>
+                                <i class="fas fa-calendar"></i> {{ event.start_date|date:'M d, Y' }}
+                            </p>
+                            <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-primary-modern btn-sm">View Details</a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted"><i class="fas fa-inbox"></i> No events this month</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling for available dates */
+    .available-day {
+        background-color: #f0fff4 !important;
+        border: 2px solid #28a745 !important;
+    }
+    
+    .available-day .calendar-day-date {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    /* Event and appointment items styling */
+    .event-item, .appointment-item {
+        display: block;
+        margin: 2px 0;
+        padding: 3px 5px;
+        border-radius: 3px;
+        font-size: 11px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .event-item a, .appointment-item a {
+        color: white !important;
+        text-decoration: none !important;
+    }
+    
+    .event-item a:hover, .appointment-item a:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}

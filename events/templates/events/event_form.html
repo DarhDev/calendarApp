@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-edit"></i> {{ title }}</h1>
+            <p>Fill in the details for your event</p>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card-modern p-5">
+                    <form method="POST" action="{% url 'events:create_event' %}" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Title Field -->
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-heading"></i> Event Title *
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern w-100 {% if form.title.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.title.id_for_label }}" 
+                                   name="{{ form.title.name }}" 
+                                   value="{{ form.title.value|default:'' }}" 
+                                   placeholder="Enter event title" 
+                                   required>
+                            {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.title.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-align-left"></i> Description
+                            </label>
+                            <textarea class="form-control-modern w-100 {% if form.description.errors %}is-invalid{% endif %}" 
+                                      id="{{ form.description.id_for_label }}" 
+                                      name="{{ form.description.name }}" 
+                                      rows="4" 
+                                      placeholder="Enter event description">{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.description.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date Time Fields -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label-modern">
+                                    <i class="fas fa-calendar"></i> Start Date *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control-modern w-100 {% if form.start_date.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.start_date.id_for_label }}" 
+                                       name="{{ form.start_date.name }}" 
+                                       value="{{ form.start_date.value|default:'' }}" 
+                                       required>
+                                {% if form.start_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.start_date.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label-modern">
+                                    <i class="fas fa-calendar"></i> End Date *
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control-modern w-100 {% if form.end_date.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.end_date.id_for_label }}" 
+                                       name="{{ form.end_date.name }}" 
+                                       value="{{ form.end_date.value|default:'' }}" 
+                                       required>
+                                {% if form.end_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.end_date.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Category and All Day -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.category.id_for_label }}" class="form-label-modern">
+                                    <i class="fas fa-tag"></i> Category *
+                                </label>
+                                <select class="form-control-modern w-100 {% if form.category.errors %}is-invalid{% endif %}" 
+                                        id="{{ form.category.id_for_label }}" 
+                                        name="{{ form.category.name }}" 
+                                        required>
+                                    <option value="">Select a category</option>
+                                    {% for value, label in form.category.field.choices %}
+                                        <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.category.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.category.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-infinity"></i> All Day Event
+                                </label>
+                                <div style="padding-top: 8px;">
+                                    <div class="form-check">
+                                        <input type="checkbox" 
+                                               class="form-check-input" 
+                                               id="{{ form.all_day.id_for_label }}" 
+                                               name="{{ form.all_day.name }}"
+                                               {% if form.all_day.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="{{ form.all_day.id_for_label }}">
+                                            This is an all-day event
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-4">
+                            <label for="{{ form.location.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-map-marker-alt"></i> Location
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern w-100" 
+                                   id="{{ form.location.id_for_label }}" 
+                                   name="{{ form.location.name }}" 
+                                   value="{{ form.location.value|default:'' }}" 
+                                   placeholder="Enter location">
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-tasks"></i> Status *
+                            </label>
+                            <select class="form-control-modern w-100" 
+                                    id="{{ form.status.id_for_label }}" 
+                                    name="{{ form.status.name }}" 
+                                    required>
+                                <option value="">Select status</option>
+                                {% for value, label in form.status.field.choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="mb-4">
+                            <label for="{{ form.color.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-palette"></i> Color
+                            </label>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                {% for color in form.color.field.choices %}
+                                <label style="cursor: pointer; display: flex; align-items: center;">
+                                    <input type="radio" 
+                                           name="{{ form.color.name }}" 
+                                           value="{{ color.0 }}"
+                                           {% if form.color.value == color.0 %}checked{% endif %}
+                                           style="margin-right: 8px;">
+                                    <div style="width: 30px; height: 30px; background: {{ color.0 }}; border-radius: 50%; border: 2px solid #ddd;"></div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                            <a href="{% url 'events:event_list' %}" class="btn btn-primary-modern w-100" style="background: #999; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success-modern w-100">
+                                <i class="fas fa-save"></i> {{ title }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"].form-control-modern,
+    input[type="datetime-local"].form-control-modern,
+    select.form-control-modern,
+    textarea.form-control-modern {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    input[type="text"].form-control-modern:focus,
+    input[type="datetime-local"].form-control-modern:focus,
+    select.form-control-modern:focus,
+    textarea.form-control-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+
+    .is-invalid {
+        border-color: var(--danger) !important;
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-wrapper {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .content p {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .content .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .content .message {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #555;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .info-item label {
+            font-weight: 600;
+            color: #666;
+        }
+        .info-item value {
+            color: #333;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin-top: 20px;
+            background-color: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background-color: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <!-- Header -->
+            <div class="header">
+                <h1>{{ title }}</h1>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <p class="title">Hello {{ user.first_name|default:user.username }},</p>
+
+                <p>You have an upcoming notification:</p>
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <div class="info-item">
+                        <label>Scheduled Time:</label>
+                        <span>{{ scheduled_time|date:'M d, Y - H:m' }}</span>
+                    </div>
+                </div>
+
+                <p style="text-align: center;">
+                    <a href="http://localhost:8000/notifications/" class="btn">View in Calendar Pro</a>
+                </p>
+
+                <p style="font-size: 12px; color: #999; margin-top: 30px;">
+                    This is an automated notification from Calendar Pro. Please don't reply to this email.
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>&copy; 2026 Calendar Pro. All rights reserved.</p>
+                <p>
+                    <a href="http://localhost:8000/notifications/" style="color: #667eea; text-decoration: none;">
+                        Manage Notifications
+                    </a>
+                    |
+                    <a href="http://localhost:8000/" style="color: #667eea; text-decoration: none;">
+                        Calendar
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-user-clock"></i> Appointments</h1>
+                    <p>Manage your scheduled appointments</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'events:create_appointment' %}" class="btn btn-success-modern">
+                        <i class="fas fa-plus"></i> Book Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        {% if appointments %}
+        <!-- Status Filter Tabs -->
+        <div class="mb-4" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="#" class="btn btn-primary-modern active" style="opacity: 1;">All</a>
+            <a href="#" class="btn btn-primary-modern" style="opacity: 0.6;">Pending</a>
+            <a href="#" class="btn btn-primary-modern" style="opacity: 0.6;">Confirmed</a>
+            <a href="#" class="btn btn-primary-modern" style="opacity: 0.6;">Completed</a>
+        </div>
+
+        <div class="row">
+            {% for appointment in appointments %}
+            <div class="col-md-6 mb-4">
+                <div class="event-card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 5px solid var(--info);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4 style="margin: 0; color: var(--dark);">{{ appointment.get_type_display }}</h4>
+                            <p style="color: #999; font-size: 0.9rem; margin: 5px 0;">
+                                <i class="fas fa-user"></i> {{ appointment.attendee_name }}
+                            </p>
+                        </div>
+                        <span class="status-badge status-{{ appointment.status|lower }}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0 0 8px 0; color: #999; font-size: 0.85rem;">
+                            <i class="fas fa-calendar"></i> Date & Time
+                        </p>
+                        <p style="margin: 0; font-weight: 600; color: var(--dark);">
+                            {{ appointment.start_time|date:'M d, Y' }} at {{ appointment.start_time|time:'H:i' }}
+                        </p>
+                    </div>
+
+                    <div style="margin: 15px 0;">
+                        {% if appointment.email %}
+                        <p style="margin: 5px 0; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-envelope"></i> {{ appointment.email }}
+                        </p>
+                        {% endif %}
+                        {% if appointment.phone %}
+                        <p style="margin: 5px 0; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-phone"></i> {{ appointment.phone }}
+                        </p>
+                        {% endif %}
+                        {% if appointment.location %}
+                        <p style="margin: 5px 0; color: #666; font-size: 0.9rem;">
+                            <i class="fas fa-map-marker-alt"></i> {{ appointment.location }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <a href="{% url 'events:appointment_detail' appointment.pk %}" class="btn btn-primary-modern" style="flex: 1;">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="{% url 'events:edit_appointment' appointment.pk %}" class="btn btn-primary-modern" style="flex: 1;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="POST" action="{% url 'events:delete_appointment' appointment.pk %}" style="flex: 1;" onsubmit="return confirm('Are you sure?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger-modern w-100">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+            <h4 style="color: #999;">No appointments yet</h4>
+            <p style="color: #bbb;">Book your first appointment to get started</p>
+            <a href="{% url 'events:create_appointment' %}" class="btn btn-success-modern">
+                <i class="fas fa-plus"></i> Book Appointment
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

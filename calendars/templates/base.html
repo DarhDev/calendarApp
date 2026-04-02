@@ -1,0 +1,552 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Calendar App{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            margin-left: 1.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: white !important;
+            border-bottom: 3px solid white;
+            padding-bottom: 0.5rem;
+        }
+
+        .navbar-toggler {
+            border: none;
+            color: white;
+        }
+
+        /* Container & Main */
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        main {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            padding: 2.5rem;
+            max-width: 1200px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-title i {
+            color: var(--primary);
+            margin-right: 1rem;
+            font-size: 2rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: transparent;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Cards */
+        .card-modern {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+
+        .card-modern-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Buttons */
+        .btn-modern {
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-modern {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary-modern:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 1rem;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .badge-success {
+            background: var(--success);
+        }
+
+        .badge-danger {
+            background: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning);
+        }
+
+        .badge-info {
+            background: var(--info);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        footer p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .nav-link {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Utility Classes */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .shadow-soft {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .transition-smooth {
+            transition: all 0.3s ease;
+        }
+
+        /* Notification Bell Styling */
+        #notificationBell {
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        #notificationBell:hover {
+            transform: scale(1.15);
+            color: white !important;
+        }
+
+        #notificationBell .badge {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.4rem;
+            min-width: 20px;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .notification-dropdown {
+            width: 380px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification-dropdown .dropdown-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .notification-dropdown .dropdown-header small {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .notification-section {
+            padding: 0.5rem 0;
+        }
+
+        .notification-title {
+            padding: 0.75rem 1rem 0 1rem;
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notification-item {
+            border: none !important;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+            color: var(--dark) !important;
+            text-decoration: none;
+        }
+
+        .notification-item:hover {
+            background-color: rgba(139, 92, 246, 0.08);
+            border-left: 3px solid var(--primary);
+            padding-left: calc(1rem - 3px);
+        }
+
+        .notification-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .notification-item p {
+            margin: 0;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .notification-item small {
+            color: #999;
+        }
+
+        .notification-footer {
+            color: var(--primary) !important;
+            font-weight: 600;
+            padding: 0.75rem !important;
+            transition: all 0.2s ease;
+        }
+
+        .notification-footer:hover {
+            background-color: rgba(139, 92, 246, 0.08) !important;
+        }
+
+        /* Scrollbar styling for notification dropdown */
+        .notification-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.4);
+            border-radius: 10px;
+        }
+
+        .notification-dropdown::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid px-5">
+            <a class="navbar-brand" href="{% url 'calendar:dashboard' %}">
+                <i class="fas fa-calendar-alt"></i>MyCalendar
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                           href="{% url 'calendar' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'calendar_view' %}active{% endif %}" 
+                           href="{% url 'calendar:calendar_view' %}">
+                            <i class="fas fa-calendar"></i> Calendar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}" 
+                           href="{% url 'calendar:event_list' %}">
+                            <i class="fas fa-list"></i> Events
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}" 
+                           href="{% url 'calendar:appointment_list' %}">
+                            <i class="fas fa-handshake"></i> Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">
+                            <i class="fas fa-cog"></i> Admin
+                        </a>
+                    </li>
+                    <!-- Notification Bell -->
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link position-relative" href="#" id="notificationBell" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            {% if upcoming_events|add:upcoming_reminders > 0 %}
+                            <span class="badge position-absolute top-0 start-100 translate-middle badge-danger p-2">
+                                {{ upcoming_events|add:upcoming_reminders }}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationBell">
+                            <div class="dropdown-header">
+                                <strong>Notifications</strong>
+                                <small class="text-muted float-end">Just now</small>
+                            </div>
+                            <hr class="my-2">
+                            
+                            <!-- Upcoming Events -->
+                            {% if upcoming_events %}
+                                <div class="notification-section">
+                                    <p class="notification-title"><i class="fas fa-calendar-check text-success"></i> Upcoming Events</p>
+                                    {% for event in upcoming_events %}
+                                        <a href="{% url 'calendar:event_detail' event.pk %}" class="dropdown-item notification-item">
+                                            <div class="d-flex align-items-start">
+                                                <div class="notification-icon" style="background-color: {{ event.color }};"></div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1"><strong>{{ event.title }}</strong></p>
+                                                    <small class="text-muted">{{ event.start_date|date:'M d, H:i' }}</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                                <hr class="my-2">
+                            {% endif %}
+                            
+                            <!-- Upcoming Reminders -->
+                            {% if upcoming_reminders %}
+                                <div class="notification-section">
+                                    <p class="notification-title"><i class="fas fa-bell text-info"></i> Upcoming Reminders</p>
+                                    {% for reminder in upcoming_reminders %}
+                                        <a href="{% url 'calendar:event_detail' reminder.event.pk %}" class="dropdown-item notification-item">
+                                            <div class="d-flex align-items-start">
+                                                <div class="notification-icon" style="background-color: #06b6d4;"></div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1"><strong>{{ reminder.event.title }}</strong></p>
+                                                    <small class="text-muted">{{ reminder.reminder_type }} in {{ reminder.time_before }} {{ reminder.time_unit }}</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                                <hr class="my-2">
+                            {% endif %}
+                            
+                            <!-- No Notifications -->
+                            {% if not upcoming_events and not upcoming_reminders %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-inbox text-muted" style="font-size: 2rem;"></i>
+                                    <p class="text-muted mt-2">No upcoming notifications</p>
+                                </div>
+                            {% endif %}
+                            
+                            <hr class="my-2">
+                            <a href="{% url 'calendar:event_list' %}" class="dropdown-item text-center notification-footer">
+                                <small>View all events</small>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 MyCalendar. All rights reserved. <small>Built with <i class="fas fa-heart text-danger"></i> using Django</small></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

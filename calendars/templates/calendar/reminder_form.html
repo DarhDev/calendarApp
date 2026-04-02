@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Set Reminder - MyCalendar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-bell"></i>
+    Set Reminder for {{ event.title }}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header">
+                <i class="fas fa-clock"></i> Reminder Details
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Event:</strong> {{ event.title }}<br>
+                    <strong>Date:</strong> {{ event.start_date|date:"M d, Y g:i A" }}
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.reminder_type.id_for_label }}">
+                            <i class="fas fa-bell"></i> {{ form.reminder_type.label }}
+                        </label>
+                        {{ form.reminder_type }}
+                        {% if form.reminder_type.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.reminder_type.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted d-block mt-2">
+                            Choose how you want to be reminded about this event
+                        </small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.time_value.id_for_label }}">
+                                    <i class="fas fa-hourglass"></i> {{ form.time_value.label }}
+                                </label>
+                                {{ form.time_value }}
+                                {% if form.time_value.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.time_value.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.time_unit.id_for_label }}">
+                                    <i class="fas fa-clock"></i> {{ form.time_unit.label }}
+                                </label>
+                                {{ form.time_unit }}
+                                {% if form.time_unit.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.time_unit.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary-modern btn-modern flex-grow-1">
+                            <i class="fas fa-save"></i> Set Reminder
+                        </button>
+                        <a href="{% url 'calendar:event_detail' event.pk %}" class="btn btn-secondary-modern btn-modern flex-grow-1">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="number"], select {
+        width: 100%;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ appointment.get_type_display }} - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-user-check"></i> {{ appointment.get_type_display }}</h1>
+            <p>Appointment Details</p>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <!-- Main Details -->
+            <div class="col-md-8 mb-4">
+                <div class="card-modern p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-info-circle"></i> Details</h3>
+                        <span class="status-badge status-{{ appointment.status|lower }}">{{ appointment.get_status_display }}</span>
+                    </div>
+                    <hr>
+
+                    <!-- Attendee Information -->
+                    <div class="mb-4">
+                        <h5 style="color: var(--dark); font-weight: 700; margin-bottom: 15px;">
+                            <i class="fas fa-user" style="color: var(--primary);"></i> Attendee Information
+                        </h5>
+                        <div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+                            <p style="margin: 0 0 10px 0;">
+                                <strong>Name:</strong> {{ appointment.attendee_name }}
+                            </p>
+                            {% if appointment.email %}
+                            <p style="margin: 0 0 10px 0;">
+                                <strong><i class="fas fa-envelope"></i> Email:</strong> 
+                                <a href="mailto:{{ appointment.email }}">{{ appointment.email }}</a>
+                            </p>
+                            {% endif %}
+                            {% if appointment.phone %}
+                            <p style="margin: 0;">
+                                <strong><i class="fas fa-phone"></i> Phone:</strong> 
+                                <a href="tel:{{ appointment.phone }}">{{ appointment.phone }}</a>
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Appointment Time & Location -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 8px;">
+                                <i class="fas fa-calendar"></i> Date & Time
+                            </p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary);">
+                                <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">
+                                    {{ appointment.start_time|date:'M d, Y' }}
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #666;">
+                                    <i class="fas fa-clock"></i> {{ appointment.start_time|time:'H:i' }}
+                                </p>
+                            </div>
+                        </div>
+                        {% if appointment.location %}
+                        <div class="col-md-6">
+                            <p style="color: #999; font-size: 0.9rem; margin-bottom: 8px;">
+                                <i class="fas fa-map-marker-alt"></i> Location
+                            </p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid var(--info);">
+                                <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">
+                                    {{ appointment.location }}
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Notes -->
+                    {% if appointment.notes %}
+                    <div class="mb-4">
+                        <h5 style="color: var(--dark); font-weight: 700; margin-bottom: 15px;">
+                            <i class="fas fa-sticky-note" style="color: var(--warning);"></i> Notes
+                        </h5>
+                        <div style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+                            <p style="margin: 0; line-height: 1.6; color: #555;">{{ appointment.notes }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 30px;">
+                        <a href="{% url 'events:edit_appointment' appointment.pk %}" class="btn btn-primary-modern" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'events:appointment_list' %}" class="btn btn-primary-modern" style="background: #999; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                        <form method="POST" action="{% url 'events:delete_appointment' appointment.pk %}" onsubmit="return confirm('Delete this appointment?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger-modern w-100">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="col-md-4">
+                <!-- Type & Status -->
+                <div class="card-modern p-4 mb-4">
+                    <h4><i class="fas fa-bookmark"></i> Appointment Info</h4>
+                    <hr>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                        <p style="margin: 0 0 10px 0;">
+                            <strong>Type:</strong><br>
+                            <span style="display: inline-block; background: rgba(102, 126, 234, 0.2); color: var(--primary); padding: 6px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 600; margin-top: 5px;">
+                                {{ appointment.get_type_display }}
+                            </span>
+                        </p>
+                        <p style="margin: 15px 0 0 0;">
+                            <strong>Status:</strong><br>
+                            <span class="status-badge status-{{ appointment.status|lower }}" style="margin-top: 5px;">
+                                {{ appointment.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card-modern p-4 mb-4">
+                    <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                    <hr>
+                    <div style="display: grid; gap: 10px;">
+                        <a href="mailto:{{ appointment.email }}" class="btn btn-primary-modern" style="text-decoration: none; text-align: center;">
+                            <i class="fas fa-envelope"></i> Send Email
+                        </a>
+                        {% if appointment.phone %}
+                        <a href="tel:{{ appointment.phone }}" class="btn btn-primary-modern" style="text-decoration: none; text-align: center;">
+                            <i class="fas fa-phone"></i> Call Attendee
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="card-modern p-4">
+                    <h4><i class="fas fa-history"></i> Appointment Timeline</h4>
+                    <hr>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                        <p style="margin: 0 0 10px 0; color: #999; font-size: 0.85rem;">
+                            <i class="fas fa-plus-circle"></i> Created
+                        </p>
+                        <p style="margin: 0; font-weight: 600;">
+                            {{ appointment.created_at|date:'M d, Y - H:i' }}
+                        </p>
+                        <hr style="margin: 15px 0; opacity: 0.3;">
+                        <p style="margin: 0 0 10px 0; color: #999; font-size: 0.85rem;">
+                            <i class="fas fa-calendar-check"></i> Scheduled For
+                        </p>
+                        <p style="margin: 0; font-weight: 600;">
+                            {{ appointment.start_time|date:'M d, Y - H:i' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

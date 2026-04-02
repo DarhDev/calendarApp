@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-list-check"></i> All Events</h1>
+                    <p>Manage and view all your events</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{% url 'events:create_event' %}" class="btn btn-success-modern">
+                        <i class="fas fa-plus"></i> Create Event
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        {% if events %}
+        <div class="row">
+            {% for event in events %}
+            <div class="col-md-6 mb-4">
+                <div class="event-card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4 style="margin: 0; color: var(--dark);">{{ event.title }}</h4>
+                            <p style="color: #999; font-size: 0.9rem; margin: 5px 0;">
+                                <i class="fas fa-calendar"></i> {{ event.start_date|date:'M d, Y' }}
+                                {% if not event.all_day %}
+                                    <i class="fas fa-clock"></i> {{ event.start_date|time:'H:i' }} - {{ event.end_date|time:'H:i' }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <span class="status-badge status-{{ event.status|lower }}">
+                            {{ event.get_status_display }}
+                        </span>
+                    </div>
+
+                    {% if event.description %}
+                    <p style="color: #666; margin: 15px 0;">{{ event.description|truncatewords:20 }}</p>
+                    {% endif %}
+
+                    <div style="margin: 15px 0;">
+                        <span class="badge-category" style="background: rgba(102, 126, 234, 0.2); color: var(--primary);">
+                            <i class="fas fa-tag"></i> {{ event.get_category_display }}
+                        </span>
+                        {% if event.location %}
+                        <span class="badge-category" style="background: rgba(78, 205, 196, 0.2); color: var(--info);">
+                            <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if event.reminders.all %}
+                    <div style="background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--dark);">
+                            <i class="fas fa-bell"></i> {{ event.reminders.count }} Reminder{{ event.reminders.count|pluralize }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-primary-modern" style="flex: 1;">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="{% url 'events:edit_event' event.pk %}" class="btn btn-primary-modern" style="flex: 1;">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="POST" action="{% url 'events:delete_event' event.pk %}" style="flex: 1;" onsubmit="return confirm('Are you sure?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger-modern w-100">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+            <h4 style="color: #999;">No events yet</h4>
+            <p style="color: #bbb;">Create your first event to get started</p>
+            <a href="{% url 'events:create_event' %}" class="btn btn-success-modern">
+                <i class="fas fa-plus"></i> Create Event
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

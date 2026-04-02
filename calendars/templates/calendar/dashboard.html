@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MyCalendar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-chart-line"></i>
+    Dashboard
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-modern">
+            <div class="card-body text-center pt-4">
+                <i class="fas fa-calendar-check fa-3x text-primary mb-2"></i>
+                <h5 class="card-title text-muted">Total Events</h5>
+                <h2 class="text-gradient">{{ upcoming_events|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-modern">
+            <div class="card-body text-center pt-4">
+                <i class="fas fa-handshake fa-3x text-info mb-2"></i>
+                <h5 class="card-title text-muted">Appointments</h5>
+                <h2 class="text-gradient">{{ upcoming_appointments|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-modern">
+            <div class="card-body text-center pt-4">
+                <i class="fas fa-bell fa-3x text-warning mb-2"></i>
+                <h5 class="card-title text-muted">Pending</h5>
+                <h2 class="text-gradient">{{ upcoming_events|length|add:upcoming_appointments|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-modern">
+            <div class="card-body text-center pt-4">
+                <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+                <h5 class="card-title text-muted">Completed</h5>
+                <h2 class="text-gradient">0</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Events -->
+    <div class="col-lg-6">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-calendar"></i> Upcoming Events (Next 7 Days)</span>
+                <a href="{% url 'calendar:create_event' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus"></i> New Event
+                </a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                    <div class="list-group list-group-flush">
+                        {% for event in upcoming_events %}
+                        <a href="{% url 'calendar:event_detail' event.pk %}" class="list-group-item list-group-item-action border-0 py-3 transition-smooth">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1 fw-600">{{ event.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock"></i> 
+                                        {{ event.start_date|date:"M d, Y - g:i A" }}
+                                    </small>
+                                    <br>
+                                    <span class="badge badge-{{ event.get_category_color }}">{{ event.category }}</span>
+                                </div>
+                                <span class="badge badge-{{ event.get_status_color }}">{{ event.status }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                        <p class="text-muted">No upcoming events</p>
+                        <a href="{% url 'calendar:create_event' %}" class="btn btn-primary-modern btn-modern">
+                            <i class="fas fa-plus"></i> Create First Event
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="col-lg-6">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-handshake"></i> Upcoming Appointments (Next 7 Days)</span>
+                <a href="{% url 'calendar:create_appointment' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus"></i> New
+                </a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_appointments %}
+                    <div class="list-group list-group-flush">
+                        {% for appointment in upcoming_appointments %}
+                        <a href="{% url 'calendar:appointment_detail' appointment.pk %}" class="list-group-item list-group-item-action border-0 py-3 transition-smooth">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1 fw-600">{{ appointment.attendee_name }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-envelope"></i> {{ appointment.attendee_email }}<br>
+                                        <i class="fas fa-phone"></i> {{ appointment.attendee_phone }}
+                                    </small>
+                                    <br>
+                                    <span class="badge badge-info">{{ appointment.appointment_type }}</span>
+                                </div>
+                                <span class="badge badge-{{ appointment.get_status_color }}">{{ appointment.status }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                        <p class="text-muted">No upcoming appointments</p>
+                        <a href="{% url 'calendar:create_appointment' %}" class="btn btn-primary-modern btn-modern">
+                            <i class="fas fa-plus"></i> Book Appointment
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

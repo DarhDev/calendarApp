@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Calendar Pro{% endblock %}
+{% load tz %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-calendar-plus"></i> {{ title }}</h1>
+            <p>Schedule and manage appointments</p>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card-modern p-5">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Appointment Type -->
+                        <div class="mb-4">
+                            <label for="{{ form.appointment_type.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-list"></i> Appointment Type *
+                            </label>
+
+                            <select name="{{ form.appointment_type.name }}"
+                                    id="{{ form.appointment_type.id_for_label }}"
+                                    class="form-control-modern w-100 {% if form.appointment_type.errors %}is-invalid{% endif %}"
+                                    required>
+
+                                <option value="">Select type</option>
+
+                                {% for value, label in form.appointment_type.field.choices %}
+                                    <option value="{{ value }}" {% if form.appointment_type.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            {% if form.appointment_type.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.appointment_type.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Attendee Name -->
+                        <div class="mb-4">
+                            <label for="{{ form.attendee_name.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-user"></i> Attendee Name *
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern w-100 {% if form.attendee_name.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.attendee_name.id_for_label }}" 
+                                   name="{{ form.attendee_name.name }}" 
+                                   value="{{ form.attendee_name.value|default:'' }}" 
+                                   placeholder="Full name" 
+                                   required>
+                            {% if form.attendee_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.attendee_name.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.attendee_email.id_for_label }}" class="form-label-modern">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input type="email"
+                                    class="form-control-modern w-100 {% if form.attendee_email.errors %}is-invalid{% endif %}"
+                                    id="{{ form.attendee_email.id_for_label }}"
+                                    name="{{ form.attendee_email.name }}"
+                                    value="{{ form.attendee_email.value|default:'' }}"
+                                    placeholder="email@example.com">
+                                {% if form.attendee_email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.attendee_email.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.attendee_phone.id_for_label }}" class="form-label-modern">
+                                    <i class="fas fa-phone"></i> Phone
+                                </label>
+                                <input type="tel"
+                                    class="form-control-modern w-100 {% if form.attendee_phone.errors %}is-invalid{% endif %}"
+                                    id="{{ form.attendee_phone.id_for_label }}"
+                                    name="{{ form.attendee_phone.name }}"
+                                    value="{{ form.attendee_phone.value|default:'' }}"
+                                    placeholder="+1 (555) 000-0000">
+                                {% if form.attendee_phone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.attendee_phone.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Date & Time -->
+                        <div class="mb-4">
+                            <label for="{{ form.start_time.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-calendar"></i> Appointment Date & Time *
+                            </label>
+
+                            <input type="datetime-local"
+                                class="form-control-modern w-100 {% if form.start_time.errors %}is-invalid{% endif %}"
+                                id="{{ form.start_time.id_for_label }}"
+                                name="{{ form.start_time.name }}"
+                                value="{{ form.start_time.value|localtime|date:'Y-m-d\\TH:i' }}"
+                                required>
+
+                            {% if form.start_time.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.start_time.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-4">
+                            <label for="{{ form.location.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-map-marker-alt"></i> Location
+                            </label>
+                            <input type="text" 
+                                   class="form-control-modern w-100" 
+                                   id="{{ form.location.id_for_label }}" 
+                                   name="{{ form.location.name }}" 
+                                   value="{{ form.location.value|default:'' }}" 
+                                   placeholder="Where will the appointment take place?">
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-tasks"></i> Status *
+                            </label>
+
+                            <select class="form-control-modern w-100" 
+                                    id="{{ form.status.id_for_label }}" 
+                                    name="{{ form.status.name }}" 
+                                    required>
+                                <option value="">Select status</option>
+
+                                {% for value, label in form.status.field.choices %}
+                                    <option value="{{ value }}"
+                                        {% if form.status.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            {% if form.status.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.status.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label-modern">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </label>
+                            <textarea class="form-control-modern w-100" 
+                                      id="{{ form.notes.id_for_label }}" 
+                                      name="{{ form.notes.name }}" 
+                                      rows="4" 
+                                      placeholder="Add any additional notes...">{{ form.notes.value|default:'' }}</textarea>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+                            <a href="{% url 'events:appointment_list' %}" class="btn btn-primary-modern w-100" style="background: #999; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success-modern w-100">
+                                <i class="fas fa-save"></i> {{ title }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"].form-control-modern,
+    input[type="email"].form-control-modern,
+    input[type="tel"].form-control-modern,
+    input[type="datetime-local"].form-control-modern,
+    select.form-control-modern,
+    textarea.form-control-modern {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    input[type="text"].form-control-modern:focus,
+    input[type="email"].form-control-modern:focus,
+    input[type="tel"].form-control-modern:focus,
+    input[type="datetime-local"].form-control-modern:focus,
+    select.form-control-modern:focus,
+    textarea.form-control-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+
+    select.form-control-modern {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 35px;
+        appearance: none;
+    }
+
+    .is-invalid {
+        border-color: var(--danger) !important;
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}

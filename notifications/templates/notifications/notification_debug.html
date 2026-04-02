@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Debug - Calendar Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-bug"></i> Notification Debug</h1>
+                    <p>Check notification system status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Statistics -->
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="card-modern p-4 text-center">
+                    <h2 style="color: var(--primary);">{{ total_notifications }}</h2>
+                    <p><strong>Total Notifications</strong></p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card-modern p-4 text-center">
+                    <h2 style="color: #ffc107;">{{ pending_notifications }}</h2>
+                    <p><strong>Pending</strong></p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card-modern p-4 text-center">
+                    <h2 style="color: #17a2b8;">{{ sent_notifications }}</h2>
+                    <p><strong>Sent</strong></p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card-modern p-4 text-center">
+                    <h2 style="color: #28a745;">{{ read_notifications }}</h2>
+                    <p><strong>Read</strong></p>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card-modern p-4 text-center">
+                    <h2 style="color: #dc3545;">{{ failed_notifications }}</h2>
+                    <p><strong>Failed</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Notifications -->
+    <div class="container">
+        <div class="card-modern p-4">
+            <h3><i class="fas fa-list"></i> Recent Notifications</h3>
+            <hr>
+            
+            {% if recent_notifications %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Scheduled Time</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notif in recent_notifications %}
+                        <tr>
+                            <td>{{ notif.title }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ notif.get_notification_type_display }}</span>
+                            </td>
+                            <td>
+                                <span class="badge" style="background-color: 
+                                    {% if notif.status == 'pending' %}#ffc107
+                                    {% elif notif.status == 'sent' %}#17a2b8
+                                    {% elif notif.status == 'read' %}#28a745
+                                    {% else %}#dc3545{% endif %};">
+                                    {{ notif.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>{{ notif.scheduled_time|date:"M d, Y H:m:s" }}</small>
+                            </td>
+                            <td>
+                                <small>{{ notif.created_at|date:"M d, Y H:m:s" }}</small>
+                            </td>
+                            <td>
+                                <a href="{% url 'notifications:notification_detail' notif.id %}" class="btn btn-sm btn-primary-modern">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>No notifications found!</strong>
+                <p>Have you created any events or appointments yet? Notifications are created automatically when you create events/appointments.</p>
+                <a href="{% url 'events:create_event' %}" class="btn btn-sm btn-primary-modern">Create Event</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- API Testing -->
+    <div class="container mt-4">
+        <div class="card-modern p-4">
+            <h3><i class="fas fa-flask"></i> API Testing</h3>
+            <hr>
+            
+            <p>Test the notification APIs:</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>1. Unread Count API</h5>
+                    <p><code>/notifications/api/unread-count/</code></p>
+                    <button class="btn btn-sm btn-primary-modern" onclick="testUnreadCount()">
+                        <i class="fas fa-play"></i> Test
+                    </button>
+                    <div id="unread-result" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none;">
+                        <pre id="unread-data"></pre>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>2. Recent Notifications API</h5>
+                    <p><code>/notifications/api/recent/?limit=5</code></p>
+                    <button class="btn btn-sm btn-primary-modern" onclick="testRecentNotifications()">
+                        <i class="fas fa-play"></i> Test
+                    </button>
+                    <div id="recent-result" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none;">
+                        <pre id="recent-data"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="container mt-4">
+        <div class="card-modern p-4 bg-light">
+            <h3><i class="fas fa-lightbulb"></i> Tips for Debugging</h3>
+            <hr>
+            <ul>
+                <li><strong>Check Browser Console:</strong> Open DevTools (F12) → Console tab to see JavaScript errors</li>
+                <li><strong>Create an Event:</strong> Go to <a href="{% url 'events:create_event' %}">Create Event</a> and create a test event. A notification should be created automatically.</li>
+                <li><strong>View Notifications:</strong> Go to <a href="{% url 'notifications:notification_list' %}">Notifications page</a> to see all created notifications.</li>
+                <li><strong>Send Pending:</strong> Run <code>python manage.py send_notifications --verbose</code> to process pending notifications.</li>
+                <li><strong>Check Signals:</strong> Make sure 'notifications' is in INSTALLED_APPS in settings.py</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Back to Notifications
+        </a>
+    </div>
+</div>
+
+<script>
+function testUnreadCount() {
+    const resultDiv = document.getElementById('unread-result');
+    const dataDiv = document.getElementById('unread-data');
+    
+    resultDiv.style.display = 'block';
+    dataDiv.textContent = 'Loading...';
+    
+    fetch('/notifications/api/unread-count/')
+        .then(response => response.json())
+        .then(data => {
+            dataDiv.textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+            dataDiv.textContent = 'Error: ' + error.message;
+        });
+}
+
+function testRecentNotifications() {
+    const resultDiv = document.getElementById('recent-result');
+    const dataDiv = document.getElementById('recent-data');
+    
+    resultDiv.style.display = 'block';
+    dataDiv.textContent = 'Loading...';
+    
+    fetch('/notifications/api/recent/?limit=5')
+        .then(response => response.json())
+        .then(data => {
+            dataDiv.textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+            dataDiv.textContent = 'Error: ' + error.message;
+        });
+}
+</script>
+{% endblock %}

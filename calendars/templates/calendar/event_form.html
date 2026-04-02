@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MyCalendar{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <i class="fas fa-edit"></i>
+    {{ title }}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-modern">
+            <div class="card-header card-modern-header">
+                <i class="fas fa-calendar-plus"></i> Event Details
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.title.id_for_label }}">
+                            <i class="fas fa-heading"></i> {{ form.title.label }}
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.description.id_for_label }}">
+                            <i class="fas fa-align-left"></i> {{ form.description.label }}
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.category.id_for_label }}">
+                                    <i class="fas fa-tag"></i> {{ form.category.label }}
+                                </label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.category.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.status.id_for_label }}">
+                                    <i class="fas fa-check-circle"></i> {{ form.status.label }}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.start_date.id_for_label }}">
+                                    <i class="fas fa-calendar-check"></i> {{ form.start_date.label }}
+                                </label>
+                                {{ form.start_date }}
+                                {% if form.start_date.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.start_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="{{ form.end_date.id_for_label }}">
+                                    <i class="fas fa-calendar-times"></i> {{ form.end_date.label }}
+                                </label>
+                                {{ form.end_date }}
+                                {% if form.end_date.errors %}
+                                    <div class="alert alert-danger mt-2">{{ form.end_date.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.location.id_for_label }}">
+                            <i class="fas fa-map-marker-alt"></i> {{ form.location.label }}
+                        </label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.location.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.color.id_for_label }}">
+                            <i class="fas fa-palette"></i> {{ form.color.label }}
+                        </label>
+                        <div class="d-flex gap-2">
+                            {{ form.color }}
+                        </div>
+                        {% if form.color.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.color.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            {{ form.is_all_day }}
+                            <label class="form-check-label" for="{{ form.is_all_day.id_for_label }}">
+                                {{ form.is_all_day.label }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary-modern btn-modern flex-grow-1">
+                            <i class="fas fa-save"></i> Save Event
+                        </button>
+                        <a href="{% url 'calendar:event_list' %}" class="btn btn-secondary-modern btn-modern flex-grow-1">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="datetime-local"], input[type="date"], input[type="time"], 
+    textarea, select {
+        width: 100%;
+    }
+</style>
+{% endblock %}

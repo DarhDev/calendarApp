@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ notification.title }} - Notifications{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-secondary mb-3">
+                        <i class="fas fa-arrow-left"></i> Back to Notifications
+                    </a>
+                    <h1>{{ notification.title }}</h1>
+                </div>
+                <div class="col-md-4 text-end">
+                    {% if notification.status != 'read' %}
+                    <form method="post" action="{% url 'notifications:mark_as_read' notification.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary-modern">
+                            <i class="fas fa-check"></i> Mark as Read
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form method="post" action="{% url 'notifications:delete_notification' notification.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Detail -->
+    <div class="container">
+        <div class="card-modern p-5">
+            <!-- Type and Status -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <label>Notification Type</label>
+                        <p>
+                            {% if notification.notification_type == 'event' %}
+                                <i class="fas fa-calendar-check"></i> Event Notification
+                            {% elif notification.notification_type == 'appointment' %}
+                                <i class="fas fa-user-clock"></i> Appointment Notification
+                            {% else %}
+                                <i class="fas fa-info-circle"></i> {{ notification.get_notification_type_display }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <label>Status</label>
+                        <p>
+                            <span class="badge" style="background-color: 
+                                {% if notification.status == 'pending' %}#ffc107
+                                {% elif notification.status == 'sent' %}#17a2b8
+                                {% elif notification.status == 'read' %}#28a745
+                                {% else %}#dc3545{% endif %}; 
+                                padding: 0.5rem 1rem; font-size: 1rem;">
+                                {{ notification.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message -->
+            <div class="card mb-4" style="border: 1px solid #eee;">
+                <div class="card-body">
+                    <h5 class="card-title">Message</h5>
+                    <p class="card-text">{{ notification.message }}</p>
+                </div>
+            </div>
+
+            <!-- Timing Information -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <label>Scheduled Time</label>
+                        <p><i class="fas fa-clock"></i> {{ notification.scheduled_time|date:'M d, Y - H:m' }}</p>
+                    </div>
+                </div>
+                {% if notification.sent_time %}
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <label>Sent Time</label>
+                        <p><i class="fas fa-check-circle"></i> {{ notification.sent_time|date:'M d, Y - H:m' }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Notification Channels -->
+            <div class="card mb-4" style="border: 1px solid #eee;">
+                <div class="card-body">
+                    <h5 class="card-title">Notification Channels</h5>
+                    <p>
+                        {% if notification.notify_in_app %}
+                        <span class="badge bg-primary"><i class="fas fa-app"></i> In-App</span>
+                        {% endif %}
+                        {% if notification.notify_email %}
+                        <span class="badge bg-info"><i class="fas fa-envelope"></i> Email</span>
+                        {% endif %}
+                        {% if notification.notify_browser %}
+                        <span class="badge bg-secondary"><i class="fas fa-browser"></i> Browser</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Related Objects -->
+            {% if notification.event_id or notification.appointment_id %}
+            <div class="card" style="border: 1px solid #eee;">
+                <div class="card-body">
+                    <h5 class="card-title">Related Item</h5>
+                    {% if notification.event_id %}
+                    <p>
+                        <i class="fas fa-calendar"></i>
+                        <a href="{% url 'events:event_detail' notification.event_id %}">View Related Event</a>
+                    </p>
+                    {% endif %}
+                    {% if notification.appointment_id %}
+                    <p>
+                        <i class="fas fa-user-clock"></i>
+                        <a href="{% url 'events:appointment_detail' notification.appointment_id %}">View Related Appointment</a>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .detail-item {
+        padding: 1rem 0;
+    }
+    
+    .detail-item label {
+        font-weight: 600;
+        color: #333;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .detail-item p {
+        margin: 0;
+        color: #555;
+        font-size: 1.05rem;
+    }
+</style>
+{% endblock %}
