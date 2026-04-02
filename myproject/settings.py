@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-)f=97oa@yxprzu$r1tr6isg##&xc7%vlqd_0*=e^^7=em6j2l(
 DEBUG = True
 
 ALLOWED_HOSTS = ['calendarapp-production-d684.up.railway.app', 'https://calendarapp-production-d684.up.railway.app']
-CSRF_TRUSTED_ORIGINS = ['calendarapp-production-d684.up.railway.app', 'https://calendarapp-production-d684.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://calendarapp-production-d684.up.railway.app']
 
 
 # Application definition
