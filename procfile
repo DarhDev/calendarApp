@@ -1,1 +1,1 @@
-sh -c "python manage.py migrate && gunicorn myproject.wsgi:application"
+gunicorn myproject.wsgi:application
