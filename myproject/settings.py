@@ -19,8 +19,8 @@ SECRET_KEY = 'django-insecure-)f=97oa@yxprzu$r1tr6isg##&xc7%vlqd_0*=e^^7=em6j2l(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['todocalendarapp-production.up.railway.app', 'https://todocalendarapp-production.up.railway.app']
-CSRF_TRUSTED_ORIGINS = ['todocalendarapp-production.up.railway.app', 'https://todocalendarapp-production.up.railway.app']
+ALLOWED_HOSTS = ['calendarapp-production-d684.up.railway.app', 'https://calendarapp-production-d684.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['calendarapp-production-d684.up.railway.app', 'https://calendarapp-production-d684.up.railway.app']
 
 
 # Application definition
